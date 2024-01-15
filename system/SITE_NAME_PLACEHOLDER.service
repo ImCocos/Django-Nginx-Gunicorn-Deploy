@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+Requires=SITE_NAME_PLACEHOLDER.socket
+After=network.target
+
+[Service]
+User=USER_PLACEHOLDER
+Group=www-data
+WorkingDirectory=WORKDIR_PLACEHOLDER
+ExecStart=ENVPATH_PLACEHOLDER/bin/gunicorn \
+--access-logfile - \
+--workers 3 \
+--bind unix:/run/SITE_NAME_PLACEHOLDER.sock \
+DJANGO_PROJECT_NAME_PLACEHOLDER.MODE_PLACEHOLDER:APPLICATION_NAME_PLACEHOLDER
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=SITE_NAME_PALCEHOLDER socket
+
+[Socket]
+ListenStream=/run/SITE_NAME_PALCEHOLDER.sock
+
+[Install]
+WantedBy=sockets.target

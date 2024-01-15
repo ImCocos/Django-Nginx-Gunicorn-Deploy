@@ -1,0 +1,21 @@
+server {
+    server_name DAEMON_PLACEHOLDER;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root STATIC_PATH_PLACEHOLDER;
+    }
+
+    location /media/ {
+        root MEDIA_PATH_PLACEHOLDER;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/SITE_NAME_PLACEHOLDER.sock;
+    }
+}
+server {
+    listen 80;
+    server_name DAEMON_PLACEHOLDER;
+}
