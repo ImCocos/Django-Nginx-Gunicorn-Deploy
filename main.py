@@ -61,7 +61,7 @@ with open('system/SITE_NAME_PLACEHOLDER.service') as file:
 
 service_file_row = service_file_row.replace('SITE_NAME_PLACEHOLDER', SITE_NAME_PLACEHOLDER)
 print(f'Site name - {SITE_NAME_PLACEHOLDER}')
-service_file_row = nginx_file_row.replace('USER_PLACEHOLDER', USER_PLACEHOLDER)
+service_file_row = service_file_row.replace('USER_PLACEHOLDER', USER_PLACEHOLDER)
 print(f'User - {USER_PLACEHOLDER}')
 
 service_file_row = service_file_row.replace('WORKDIR_PLACEHOLDER', WORKDIR_PLACEHOLDER)
