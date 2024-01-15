@@ -110,5 +110,15 @@ os.system(f'sudo cp {SITE_NAME_PLACEHOLDER}.tmp {SITES_AVAILABLE_PATH}/{SITE_NAM
 os.system(f'sudo cp {SITE_NAME_PLACEHOLDER}.service.tmp {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.service')
 os.system(f'sudo cp {SITE_NAME_PLACEHOLDER}.socket.tmp {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.socket')
 
+print('Configs pasted successfully.')
+print(f'Enabling {SITE_NAME_PLACEHOLDER} and reloading nginx...')
+print()
+
+os.system(f'sudo systemctl enable {SITE_NAME_PLACEHOLDER}')
+os.system(f'sudo systemctl start {SITE_NAME_PLACEHOLDER}')
+os.system('sudo systemctl daemon-reload')
+os.system(f'sudo systemctl restart {SITE_NAME_PLACEHOLDER}')
+os.system('sudo systemctl restart nginx')
+
 print(f'Configs were copiposting successfully!')
 print(f'Try to visit {DAEMON_PLACEHOLDER}')
