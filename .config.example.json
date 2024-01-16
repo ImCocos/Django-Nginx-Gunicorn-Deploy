@@ -1,0 +1,26 @@
+{
+    // Sites enabled path(nginx)
+    "SITES_ENABLED_PATH": "",
+    // Sites available path(nginx)
+    "SITES_AVAILABLE_PATH": "",
+    // Services path(gunicorn)
+    "GUNICORN_FILES_PATH": "",
+    // [*] Site name(for nginx and gunicorn)
+    "SITE_NAME_PLACEHOLDER": "",
+    // Daemon
+    "DAEMON_PLACEHOLDER": "",
+    // [*] User
+    "USER_PLACEHOLDER": "",
+    // [*] Workdir
+    "WORKDIR_PLACEHOLDER": "",
+    // Static path
+    "STATIC_PATH_PLACEHOLDER": "",
+    // Media path
+    "MEDIA_PATH_PLACEHOLDER": "",
+    // [*] Virtual enviroment path
+    "ENVPATH_PLACEHOLDER": "",
+    // Filename with application(gunicorn)
+    "APPLICATION_FILE_PLACEHOLDER": "",
+    // Application name(gunicorn)
+    "APPLICATION_NAME_PLACEHOLDER": ""
+}
