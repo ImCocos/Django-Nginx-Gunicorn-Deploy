@@ -19,7 +19,7 @@
     "MEDIA_PATH_PLACEHOLDER": "",
     // [*] Virtual enviroment path
     "ENVPATH_PLACEHOLDER": "",
-    // Filename with application(gunicorn)
+    // [*] Filename with application(gunicorn)
     "APPLICATION_FILE_PLACEHOLDER": "",
     // Application name(gunicorn)
     "APPLICATION_NAME_PLACEHOLDER": ""
