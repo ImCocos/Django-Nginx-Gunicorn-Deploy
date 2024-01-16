@@ -41,6 +41,14 @@ cd {SITE_PATH};
 ''')
 
 
+with open(os.path.join(SITE_PATH, SITE_NAME_FOR_DJANGIO, 'settings.py'), 'r') as file:
+    row = file.read()
+    row = row.replace('ALLOWED_HOSTS = []', f'ALLOWED_HOSTS = ["{DAEMON}"]')
+
+with open(os.path.join(SITE_PATH, SITE_NAME_FOR_DJANGIO, 'settings.py'), 'w') as file:
+    file.write(row)
+
+
 dot_tmp = f"""
 {SITE_NAME}
 {DAEMON}

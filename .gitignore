@@ -1,4 +1,4 @@
 **env**
 
 .debug.py
-.tmp
+*tmp*
