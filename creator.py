@@ -36,7 +36,7 @@ cmd(f'mkdir {os.path.join(WORKDIR_PLACEHOLDER, SITE_NAME)}')
 cmd(f'{PYTHON_PATH} -m venv {ENV_PATH}')
 cmd(f'''
 cd {SITE_PATH};
-{os.path.join(ENV_PATH, "bin/python3.11")} -m pip install django gunicorn;
+sudo {os.path.join(ENV_PATH, "bin/python3.11")} -m pip install django gunicorn;
 {os.path.join(ENV_PATH, "bin/python3.11")} -m django startproject {SITE_NAME_FOR_DJANGIO} .;
 ''')
 
