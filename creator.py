@@ -33,7 +33,7 @@ ENV_PATH = os.path.join(SITE_PATH, 'env')
 
 
 cmd(f'mkdir {os.path.join(WORKDIR_PLACEHOLDER, SITE_NAME)}')
-cmd(f'{PYTHON_PATH} -m venv {os.path.join(SITE_PATH, "env")}')
+cmd(f'{PYTHON_PATH} -m venv {ENV_PATH}')
 cmd(f'''
 cd {SITE_PATH};
 {os.path.join(ENV_PATH, "bin/python3.11")} -m pip install django gunicorn;
