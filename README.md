@@ -23,3 +23,8 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 3. ```
     python main make <site_name>.ini
     ```
+
+# Dependencies
+
+ - nginx
+ - gunicorn(in virtual environment of your project)
