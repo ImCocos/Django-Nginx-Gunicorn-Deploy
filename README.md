@@ -14,13 +14,11 @@ Done!
 
 # Deploying
 
-> Please **DO NOT WRITE COMMENTS ON LINES WITH VALUES IN CONFIG!!!**
-
 ## Config way:
 
 1. ```
     cd Django-Nginx-Gunicorn-Deploy
-    cp config.example.ini config.ini
+    cp config.example.ini <site_name>.ini
     ```
 2. Fill the config
 
