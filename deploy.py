@@ -131,7 +131,7 @@ service_file_row = service_file_row.replace('APPLICATION_NAME_PLACEHOLDER', APPL
 print(f'Application name - {APPLICATION_NAME_PLACEHOLDER}')
 
 
-with open(os.path.join(CURRENT_DIRECTORY, f'{SITE_NAME_PLACEHOLDER}.service.tmp', 'w')) as file:
+with open(os.path.join(CURRENT_DIRECTORY, f'{SITE_NAME_PLACEHOLDER}.service.tmp'), 'w') as file:
     file.write(service_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.service.tmp file created')
 
@@ -147,7 +147,7 @@ socket_file_row = socket_file_row.replace('SITE_NAME_PLACEHOLDER', SITE_NAME_PLA
 print(f'Site name - {SITE_NAME_PLACEHOLDER}')
 
 
-with open(os.path.join(CURRENT_DIRECTORY, f'{SITE_NAME_PLACEHOLDER}.socket.tmp', 'w')) as file:
+with open(os.path.join(CURRENT_DIRECTORY, f'{SITE_NAME_PLACEHOLDER}.socket.tmp'), 'w') as file:
     file.write(socket_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.socket.tmp file created')
 
