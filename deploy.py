@@ -2,9 +2,9 @@ import os
 
 import sys
 
-import json
+import configparser
 
-
+config_file: None | str
 try:
     config_file = sys.argv[1]
 except IndexError:
@@ -53,32 +53,25 @@ if not config_file:
 
     APPLICATION_NAME_PLACEHOLDER = input('Your wsgi/asgi application name(in code): ') or 'application'
 else:
-    with open(config_file, 'r') as json_file:
-        row_file = json_file.read()
-        final_config = ''
-        for string in row_file.split('\n'):
-            if '//' not in string:
-                final_config += string
-
-    file = json.loads(final_config)
-    print(file)
-    SITES_ENABLED_PATH = file['SITES_ENABLED_PATH'] or '/etc/nginx/sites-enabled/'
-    SITES_AVAILABLE_PATH = file['SITES_AVAILABLE_PATH'] or '/etc/nginx/sites-available/'
-    GUNICORN_FILES_PATH = file['GUNICORN_FILES_PATH'] or '/etc/systemd/system'
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    SITES_ENABLED_PATH = config['nginx']['SitesEnabledPath'] or '/etc/nginx/sites-enabled/'
+    SITES_AVAILABLE_PATH = config['nginx']['SitesAvailablePath'] or '/etc/nginx/sites-available/'
+    GUNICORN_FILES_PATH = config['gunicorn']['GunicornServicesPath'] or '/etc/systemd/system'
     path_or_raise(SITES_ENABLED_PATH)
     path_or_raise(SITES_AVAILABLE_PATH)
     path_or_raise(GUNICORN_FILES_PATH)
-    SITE_NAME_PLACEHOLDER = file['SITE_NAME_PLACEHOLDER']
-    DAEMON_PLACEHOLDER = file['DAEMON_PLACEHOLDER'] or '127.0.0.1'
-    USER_PLACEHOLDER = file['USER_PLACEHOLDER']
-    WORKDIR_PLACEHOLDER = file['WORKDIR_PLACEHOLDER']
+    SITE_NAME_PLACEHOLDER = config['DEFAULT']['SiteName']
+    DAEMON_PLACEHOLDER = config['DEFAULT']['Daemon'] or '127.0.0.1'
+    USER_PLACEHOLDER = config['DEFAULT']['User']
+    WORKDIR_PLACEHOLDER = config['DEFAULT']['WorkingDirectory']
     path_or_raise(WORKDIR_PLACEHOLDER)
-    STATIC_PATH_PLACEHOLDER = file['STATIC_PATH_PLACEHOLDER'] or WORKDIR_PLACEHOLDER
-    MEDIA_PATH_PLACEHOLDER = file['MEDIA_PATH_PLACEHOLDER'] or WORKDIR_PLACEHOLDER
-    ENVPATH_PLACEHOLDER = file['ENVPATH_PLACEHOLDER']
+    STATIC_PATH_PLACEHOLDER = config['DEFAULT']['StaticPath'] or WORKDIR_PLACEHOLDER
+    MEDIA_PATH_PLACEHOLDER = config['DEFAULT']['MediaPath'] or WORKDIR_PLACEHOLDER
+    ENVPATH_PLACEHOLDER = config['DEFAULT']['VirtualEnviromentPath']
     path_or_raise(ENVPATH_PLACEHOLDER)
-    APPLICATION_FILE_PLACEHOLDER = file['APPLICATION_FILE_PLACEHOLDER']
-    APPLICATION_NAME_PLACEHOLDER = file['APPLICATION_NAME_PLACEHOLDER'] or 'application'
+    APPLICATION_FILE_PLACEHOLDER = config['application']['ApplicationFile']
+    APPLICATION_NAME_PLACEHOLDER = config['application']['ApplicationName'] or 'application'
 
 print()
 print('Data is stored.')
@@ -143,16 +136,16 @@ with open(f'{SITE_NAME_PLACEHOLDER}.service.tmp', 'w') as file:
 print()
 print('---# Socket config #---')
 with open('system/SITE_NAME_PLACEHOLDER.socket') as file:
-    scoket_file_row = file.read()
+    socket_file_row = file.read()
     print('Config template read successfully.')
 
 
-scoket_file_row = scoket_file_row.replace('SITE_NAME_PLACEHOLDER', SITE_NAME_PLACEHOLDER)
+socket_file_row = socket_file_row.replace('SITE_NAME_PLACEHOLDER', SITE_NAME_PLACEHOLDER)
 print(f'Site name - {SITE_NAME_PLACEHOLDER}')
 
 
 with open(f'{SITE_NAME_PLACEHOLDER}.socket.tmp', 'w') as file:
-    file.write(scoket_file_row)
+    file.write(socket_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.socket.tmp file created')
 
 
@@ -160,7 +153,6 @@ print()
 print('Configs were created successfully')
 print(f'Starting moving configs to nginx & system dirs...')
 print()
-
 
 confirmation = input('Are everything right?[Y/n, Yes/no]: ').lower()
 if confirmation in ('n', 'no'):

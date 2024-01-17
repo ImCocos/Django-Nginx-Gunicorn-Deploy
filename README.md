@@ -20,12 +20,12 @@ Done!
 
 1. ```
     cd Django-Nginx-Gunicorn-Deploy
-    cp .config.example.json .config.json
+    cp config.example.ini config.ini
     ```
 2. Fill the config
 
 3. ```
-    python deploy.py .config.json
+    python deploy.py config.ini
     ```
 
 ## Or if don't like writing configs to generate configs
