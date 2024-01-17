@@ -165,10 +165,10 @@ if confirmation in ('n', 'no'):
     os.system(f'rm {SITE_NAME_PLACEHOLDER}.socket.tmp')
 
 
-os.system(f'sudo cp {SITE_NAME_PLACEHOLDER}.tmp {SITES_ENABLED_PATH}/{SITE_NAME_PLACEHOLDER}')
-os.system(f'sudo mv {SITE_NAME_PLACEHOLDER}.tmp {SITES_AVAILABLE_PATH}/{SITE_NAME_PLACEHOLDER}')
-os.system(f'sudo mv {SITE_NAME_PLACEHOLDER}.service.tmp {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.service')
-os.system(f'sudo mv {SITE_NAME_PLACEHOLDER}.socket.tmp {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.socket')
+os.system(f'sudo cp {os.path.join(CURRENT_DIRECTORY, SITE_NAME_PLACEHOLDER + ".tmp")} {SITES_ENABLED_PATH}/{SITE_NAME_PLACEHOLDER}')
+os.system(f'sudo mv {os.path.join(CURRENT_DIRECTORY, SITE_NAME_PLACEHOLDER + ".tmp")} {SITES_AVAILABLE_PATH}/{SITE_NAME_PLACEHOLDER}')
+os.system(f'sudo mv {os.path.join(CURRENT_DIRECTORY, SITE_NAME_PLACEHOLDER + ".service.tmp")} {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.service')
+os.system(f'sudo mv {os.path.join(CURRENT_DIRECTORY, SITE_NAME_PLACEHOLDER + ".socket.tmp")} {GUNICORN_FILES_PATH}/{SITE_NAME_PLACEHOLDER}.socket')
 
 
 print('Configs were moved successfully.')
