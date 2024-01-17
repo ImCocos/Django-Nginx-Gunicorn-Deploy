@@ -80,7 +80,7 @@ print()
 
 
 print('---# Nginx config #---')
-with open('sites-available/SITE_NAME_PLACEHOLDER') as file:
+with open(os.path.join(os.path.realpath(__file__), 'sites-available/SITE_NAME_PLACEHOLDER')) as file:
     nginx_file_row = file.read()
     print('Config template read successfully.')
 
@@ -97,14 +97,14 @@ print(f'Static path - {STATIC_PATH_PLACEHOLDER}')
 nginx_file_row = nginx_file_row.replace('MEDIA_PATH_PLACEHOLDER', MEDIA_PATH_PLACEHOLDER)
 print(f'Media path - {MEDIA_PATH_PLACEHOLDER}')
 
-with open(f'{SITE_NAME_PLACEHOLDER}.tmp', 'w') as file:
+with open(os.path.join(os.path.realpath(__file__), f'{SITE_NAME_PLACEHOLDER}.tmp'), 'w') as file:
     file.write(nginx_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.tmp file created')
 
 
 print()
 print('---# Service config #---')
-with open('system/SITE_NAME_PLACEHOLDER.service') as file:
+with open(os.path.join(os.path.realpath(__file__), 'system/SITE_NAME_PLACEHOLDER.service')) as file:
     service_file_row = file.read()
     print('Config template read successfully.')
 
@@ -128,14 +128,14 @@ service_file_row = service_file_row.replace('APPLICATION_NAME_PLACEHOLDER', APPL
 print(f'Application name - {APPLICATION_NAME_PLACEHOLDER}')
 
 
-with open(f'{SITE_NAME_PLACEHOLDER}.service.tmp', 'w') as file:
+with open(os.path.join(os.path.realpath(__file__), f'{SITE_NAME_PLACEHOLDER}.service.tmp', 'w')) as file:
     file.write(service_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.service.tmp file created')
 
 
 print()
 print('---# Socket config #---')
-with open('system/SITE_NAME_PLACEHOLDER.socket') as file:
+with open(os.path.join(os.path.realpath(__file__), 'system/SITE_NAME_PLACEHOLDER.socket')) as file:
     socket_file_row = file.read()
     print('Config template read successfully.')
 
@@ -144,7 +144,7 @@ socket_file_row = socket_file_row.replace('SITE_NAME_PLACEHOLDER', SITE_NAME_PLA
 print(f'Site name - {SITE_NAME_PLACEHOLDER}')
 
 
-with open(f'{SITE_NAME_PLACEHOLDER}.socket.tmp', 'w') as file:
+with open(os.path.join(os.path.realpath(__file__), f'{SITE_NAME_PLACEHOLDER}.socket.tmp', 'w')) as file:
     file.write(socket_file_row)
     print(f'{SITE_NAME_PLACEHOLDER}.socket.tmp file created')
 
