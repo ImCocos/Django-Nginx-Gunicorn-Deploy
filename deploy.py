@@ -17,8 +17,8 @@ def path_or_raise(path: str) -> None:
 
 
 print('Deploy process started...')
-print('Requeired fields will be marked with [*]')
-print('Other fileds aren\'t necessary to fill')
+print('Required fields will be marked with [*]')
+print('Other fileds aren\'t required to fill')
 print()
 
 if not config_file:
