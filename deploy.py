@@ -4,6 +4,7 @@ import sys
 
 import configparser
 
+
 config_file: None | str
 try:
     config_file = sys.argv[1]
