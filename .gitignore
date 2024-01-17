@@ -2,3 +2,5 @@
 
 .debug.py
 *tmp*
+
+**__pycache__**
