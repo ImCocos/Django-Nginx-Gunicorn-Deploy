@@ -13,11 +13,11 @@ if cmd == 'help':
     string = '''
 help - all flags
 
-make sites/<SiteName>.ini - creates configs and starts site
-start sites/<SiteName>.ini - starts site
-stop sites/<SiteName>.ini - stops site
-reload sites/<SiteName>.ini - reloads site
-delete sites/<SiteName>.ini - deletes ALL site configs beside <SiteName>.ini
+make <SiteName> - creates configs and starts site
+start <SiteName> - starts site
+stop <SiteName> - stops site
+reload <SiteName> - reloads site
+delete <SiteName> - deletes ALL site configs beside <SiteName>.ini
 '''.strip()
     print(string)
     sys.exit(1)
@@ -28,7 +28,7 @@ if cmd not in ('make', 'start', 'stop', 'delete', 'reload'):
     sys.exit(1)
 
 try:
-    arg = sys.argv[2]
+    arg = 'sites/' + sys.argv[2] + '.ini'
 except IndexError:
     raise AttributeError(f'Pass argument with {cmd}')
 
