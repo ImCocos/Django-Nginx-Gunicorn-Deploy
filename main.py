@@ -23,7 +23,7 @@ delete sites/<SiteName>.ini - deletes ALL site configs beside <SiteName>.ini
     sys.exit(1)
 
 
-if cmd not in ('make', 'start', 'stop', 'delete'):
+if cmd not in ('make', 'start', 'stop', 'delete', 'reload'):
     print('Unbound command! Try "sitemanager help"')
     sys.exit(1)
 
