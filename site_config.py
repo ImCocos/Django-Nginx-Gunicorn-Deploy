@@ -1,13 +1,16 @@
-from typing import Dict, Tuple
+from typing import Any
 
 import os
 
 import configparser
 
 
+CWD = os.path.dirname(__file__)
+
+
 class Site:
-    def __raise_if_none(self) -> None:
-        raise ValueError
+    def __raise_if_none(self, name: str) -> Any:
+            raise AttributeError(f'"{name}" can\'t be empty!')
 
     def validate_paths(self, *paths) -> None:
         for path in paths:
@@ -21,25 +24,25 @@ class Site:
             inline_comment_prefixes='#',
             empty_lines_in_values=True
         )
-        config.read(name)
+        config.read(os.path.join(CWD, name))
 
         defaults = configparser.ConfigParser()
-        defaults.read('.inis/.defaults.ini')
+        defaults.read(os.path.join(CWD, 'defaults.ini'))
 
-        self.name=config['DEFAULT']['SiteName'] or self.__raise_if_none()
-        self.user=config['DEFAULT']['User'] or self.__raise_if_none()
-        self.workdir=config['DEFAULT']['WorkingDirectory'] or self.__raise_if_none()
-        self.virtual_enviromnt_path=config['DEFAULT']['VirtualEnviromentPath'] or self.__raise_if_none()
-        self.application_file=config['application']['ApplicationFile'] or self.__raise_if_none()
+        self.name = config['DEFAULT']['SiteName'] or self.__raise_if_none('SiteName')
+        self.user = config['DEFAULT']['User'] or self.__raise_if_none('User')
+        self.workdir = config['DEFAULT']['WorkingDirectory'] or self.__raise_if_none('WorkingDirectory')
+        self.virtual_enviromnt_path = config['DEFAULT']['VirtualEnviromentPath'] or self.__raise_if_none('VirtualEnviromentPath')
+        self.application_file = config['application']['ApplicationFile'] or self.__raise_if_none('ApplicationFile')
 
-        self.application_name=config['application']['ApplicationName'] or defaults['application']['ApplicationName']
-        self.sites_enabled_path=config['nginx']['SitesEnabledPath'] or defaults['nginx']['SitesEnabledPath']
-        self.sites_available_path=config['nginx']['SitesAvailablePath'] or defaults['nginx']['SitesAvailablePath']
-        self.gunicorn_services_path=config['gunicorn']['GunicornServicesPath'] or defaults['gunicorn']['GunicornServicesPath']
+        self.application_name = config['application']['ApplicationName'] or defaults['application']['ApplicationName']
+        self.sites_enabled_path = config['nginx']['SitesEnabledPath'] or defaults['nginx']['SitesEnabledPath']
+        self.sites_available_path = config['nginx']['SitesAvailablePath'] or defaults['nginx']['SitesAvailablePath']
+        self.gunicorn_services_path = config['gunicorn']['GunicornServicesPath'] or defaults['gunicorn']['GunicornServicesPath']
         self.daemon = config['DEFAULT']['Daemon'] or defaults['DEFAULT']['Daemon']
 
-        self.static_path=config['DEFAULT']['StaticPath'] or self.workdir
-        self.media_path=config['DEFAULT']['MediaPath'] or self.workdir
+        self.static_path = config['DEFAULT']['StaticPath'] or self.workdir
+        self.media_path = config['DEFAULT']['MediaPath'] or self.workdir
 
         self.validate_paths(
             self.workdir,
@@ -49,8 +52,10 @@ class Site:
             self.gunicorn_services_path
         )
 
+        os.system(f'{self.virtual_enviromnt_path}/bin/python -m pip install gunicorn --no-cache-dir')
+
     def __make_nginx_config(self) -> None:
-        with open('.sites-available/SITE_NAME_PLACEHOLDER') as file:
+        with open(os.path.join(CWD, '.sites-available/SITE_NAME_PLACEHOLDER')) as file:
             nginx_file_row = file.read()
 
         nginx_file_row = nginx_file_row.replace('SITE_NAME_PLACEHOLDER', self.name)
@@ -58,11 +63,11 @@ class Site:
         nginx_file_row = nginx_file_row.replace('STATIC_PATH_PLACEHOLDER', self.static_path)
         nginx_file_row = nginx_file_row.replace('MEDIA_PATH_PLACEHOLDER', self.media_path)
 
-        with open(f'{self.name}.tmp', 'w') as file:
+        with open(os.path.join(CWD, f'{self.name}.tmp'), 'w') as file:
             file.write(nginx_file_row)
 
     def __make_gunicorn_service(self) -> None:
-        with open('.system/SITE_NAME_PLACEHOLDER.service') as file:
+        with open(os.path.join(CWD, '.system/SITE_NAME_PLACEHOLDER.service')) as file:
             service_file_row = file.read()
 
         service_file_row = service_file_row.replace('SITE_NAME_PLACEHOLDER', self.name)
@@ -72,16 +77,16 @@ class Site:
         service_file_row = service_file_row.replace('APPLICATION_FILE_PLACEHOLDER', self.application_file)
         service_file_row = service_file_row.replace('APPLICATION_NAME_PLACEHOLDER', self.application_name)
 
-        with open(f'{self.name}.service.tmp', 'w') as file:
+        with open(os.path.join(CWD, f'{self.name}.service.tmp'), 'w') as file:
             file.write(service_file_row)
 
     def __make_gunicorn_socket(self) -> None:
-        with open('.system/SITE_NAME_PLACEHOLDER.socket') as file:
+        with open(os.path.join(CWD, '.system/SITE_NAME_PLACEHOLDER.socket')) as file:
             socket_file_row = file.read()
 
         socket_file_row = socket_file_row.replace('SITE_NAME_PLACEHOLDER', self.name)
 
-        with open(f'{self.name}.socket.tmp', 'w') as file:
+        with open(os.path.join(CWD, f'{self.name}.socket.tmp'), 'w') as file:
             file.write(socket_file_row)
 
     def __make_configs(self) -> None:
@@ -90,30 +95,30 @@ class Site:
         self.__make_gunicorn_socket()
 
     def __move_configs(self) -> None:
-        os.system(f'sudo cp {self.name}.tmp {self.sites_enabled_path}/{self.name}')
-        os.system(f'sudo mv {self.name}.tmp {self.sites_available_path}/{self.name}')
-        os.system(f'sudo mv {self.name}.service.tmp {self.gunicorn_services_path}/{self.name}.service')
-        os.system(f'sudo mv {self.name}.socket.tmp {self.gunicorn_services_path}/{self.name}.socket')
+        os.system(f'cp {self.name}.tmp {self.sites_enabled_path}/{self.name}')
+        os.system(f'mv {self.name}.tmp {self.sites_available_path}/{self.name}')
+        os.system(f'mv {self.name}.service.tmp {self.gunicorn_services_path}/{self.name}.service')
+        os.system(f'mv {self.name}.socket.tmp {self.gunicorn_services_path}/{self.name}.socket')
 
     def reload(self) -> None:
-        os.system(f'sudo systemctl restart {self.name}')
-        os.system('sudo systemctl daemon-reload')
-        os.system('sudo systemctl restart nginx')
+        os.system(f'systemctl restart {self.name}')
+        os.system('systemctl daemon-reload')
+        os.system('systemctl restart nginx')
 
     def stop(self) -> None:
-        os.system(f'sudo systemctl disable {self.name}')
-        os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
-        os.system('sudo systemctl daemon-reload')
-        os.system('sudo systemctl restart nginx')
+        os.system(f'systemctl disable {self.name}')
+        os.system(f'systemctl stop {self.name}')
+        os.system(f'rm {self.sites_enabled_path}/{self.name}')
+        os.system('systemctl daemon-reload')
+        os.system('systemctl restart nginx')
 
     def start(self) -> None:
-        os.system(f'sudo systemctl enable {self.name}')
-        os.system(f'sudo systemctl start {self.name}')
-        os.system(f'sudo systemctl restart {self.name}')
-        os.system(f'sudo cp {self.sites_available_path}/{self.name} {self.sites_enabled_path}/{self.name}')
-        os.system('sudo systemctl daemon-reload')
-        os.system('sudo systemctl restart nginx')
+        os.system(f'systemctl enable {self.name}')
+        os.system(f'systemctl start {self.name}')
+        os.system(f'systemctl restart {self.name}')
+        os.system(f'cp {self.sites_available_path}/{self.name} {self.sites_enabled_path}/{self.name}')
+        os.system('systemctl daemon-reload')
+        os.system('systemctl restart nginx')
 
     def make(self) -> None:
         self.__make_configs()
@@ -121,11 +126,11 @@ class Site:
         self.reload()
 
     def delete(self) -> None:
-        os.system(f'sudo systemctl disable {self.name}')
-        os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
-        os.system(f'sudo rm {self.sites_available_path}/{self.name}')
-        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.service')
-        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.socket')
-        os.system('sudo systemctl daemon-reload')
-        os.system('sudo systemctl restart nginx')
+        os.system(f'systemctl disable {self.name}')
+        os.system(f'systemctl stop {self.name}')
+        os.system(f'rm {self.sites_enabled_path}/{self.name}')
+        os.system(f'rm {self.sites_available_path}/{self.name}')
+        os.system(f'rm {self.gunicorn_services_path}/{self.name}.service')
+        os.system(f'rm {self.gunicorn_services_path}/{self.name}.socket')
+        os.system('systemctl daemon-reload')
+        os.system('systemctl restart nginx')

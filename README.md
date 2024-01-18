@@ -1,8 +1,7 @@
-# Django + gunciron + nginx easy deploy
+# gunciron + nginx easy deploy
 Tired from copipasting your configs over and over?
 
 This is great solution for you!
-Have **no dependencies** besides python, pip, venv
 
 # Installing
 
@@ -14,17 +13,19 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 
 1. ```
     cd Django-Nginx-Gunicorn-Deploy
-    cp config.example.ini <site_name>.ini
+    sudo make
+    cp config.example.ini sites/<site_name>.ini
     ```
+2. Reload shell
 
-2. Fill the config.
-    > Required fileds are marked with *, other aren't necessary.
+3. Fill the config.
+    > Required fileds are marked with [*], other aren't necessary.
 
 3. ```
-    python main make <site_name>.ini
+    sudo sitemanager help
     ```
 
 # Dependencies
 
  - nginx
- - gunicorn(in virtual environment of your project)
+ - make
