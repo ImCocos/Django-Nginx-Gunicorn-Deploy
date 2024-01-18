@@ -101,7 +101,8 @@ class Site:
         os.system(f'sudo mv {os.path.join(CWD, self.name + ".socket.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".socket")}')
 
     def reload(self) -> None:
-        os.system(f'sudo systemctl restart {self.name}')
+        os.system(f'sudo systemctl restart {self.name}.socket')
+        os.system(f'sudo systemctl restart {self.name}.service')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
