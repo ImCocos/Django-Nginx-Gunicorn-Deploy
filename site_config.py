@@ -52,8 +52,6 @@ class Site:
             self.gunicorn_services_path
         )
 
-        os.system(f'{self.virtual_enviromnt_path}/bin/python -m pip install gunicorn --no-cache-dir')
-
     def __make_nginx_config(self) -> None:
         with open(os.path.join(CWD, '.sites-available/SITE_NAME_PLACEHOLDER')) as file:
             nginx_file_row = file.read()
@@ -124,6 +122,7 @@ class Site:
     def make(self) -> None:
         self.__make_configs()
         self.__move_configs()
+        os.system(f'{self.virtual_enviromnt_path}/bin/python -m pip install gunicorn --no-cache-dir')
         self.reload()
 
     def delete(self) -> None:
