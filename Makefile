@@ -1,5 +1,5 @@
 CWD := $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+FILE := $(shell read -p "We need to add alias. Enter absolute path to your .rc file: " enter ; echo $${enter})
 
 install:
-	@read -p "We need to add aliases. Path to your shell .rc: " SP
-	@echo '\nalias sitemanager="python3.11 $(CWD)/main.py"' >> $(SP)
+	@echo 'alias sitemanager="python3.11 $(CWD)/main.py"' >> "$(FILE)"
