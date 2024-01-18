@@ -95,30 +95,30 @@ class Site:
         self.__make_gunicorn_socket()
 
     def __move_configs(self) -> None:
-        os.system(f'cp {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_enabled_path, self.name)}')
-        os.system(f'mv {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_available_path, self.name)}')
-        os.system(f'mv {os.path.join(CWD, self.name + ".service.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".service")}')
-        os.system(f'mv {os.path.join(CWD, self.name + ".socket.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".socket")}')
+        os.system(f'sudo cp {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_enabled_path, self.name)}')
+        os.system(f'sudo mv {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_available_path, self.name)}')
+        os.system(f'sudo mv {os.path.join(CWD, self.name + ".service.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".service")}')
+        os.system(f'sudo mv {os.path.join(CWD, self.name + ".socket.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".socket")}')
 
     def reload(self) -> None:
-        os.system(f'systemctl restart {self.name}')
-        os.system('systemctl daemon-reload')
-        os.system('systemctl restart nginx')
+        os.system(f'sudo systemctl restart {self.name}')
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl restart nginx')
 
     def stop(self) -> None:
-        os.system(f'systemctl disable {self.name}')
-        os.system(f'systemctl stop {self.name}')
-        os.system(f'rm {self.sites_enabled_path}/{self.name}')
-        os.system('systemctl daemon-reload')
-        os.system('systemctl restart nginx')
+        os.system(f'sudo systemctl disable {self.name}')
+        os.system(f'sudo systemctl stop {self.name}')
+        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl restart nginx')
 
     def start(self) -> None:
-        os.system(f'systemctl enable {self.name}')
-        os.system(f'systemctl start {self.name}')
-        os.system(f'systemctl restart {self.name}')
-        os.system(f'cp {self.sites_available_path}/{self.name} {self.sites_enabled_path}/{self.name}')
-        os.system('systemctl daemon-reload')
-        os.system('systemctl restart nginx')
+        os.system(f'sudo systemctl enable {self.name}')
+        os.system(f'sudo systemctl start {self.name}')
+        os.system(f'sudo systemctl restart {self.name}')
+        os.system(f'sudo cp {self.sites_available_path}/{self.name} {self.sites_enabled_path}/{self.name}')
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl restart nginx')
 
     def make(self) -> None:
         self.__make_configs()
@@ -126,11 +126,11 @@ class Site:
         self.reload()
 
     def delete(self) -> None:
-        os.system(f'systemctl disable {self.name}')
-        os.system(f'systemctl stop {self.name}')
-        os.system(f'rm {self.sites_enabled_path}/{self.name}')
-        os.system(f'rm {self.sites_available_path}/{self.name}')
-        os.system(f'rm {self.gunicorn_services_path}/{self.name}.service')
-        os.system(f'rm {self.gunicorn_services_path}/{self.name}.socket')
-        os.system('systemctl daemon-reload')
-        os.system('systemctl restart nginx')
+        os.system(f'sudo systemctl disable {self.name}')
+        os.system(f'sudo systemctl stop {self.name}')
+        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
+        os.system(f'sudo rm {self.sites_available_path}/{self.name}')
+        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.service')
+        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.socket')
+        os.system('sudo systemctl daemon-reload')
+        os.system('sudo systemctl restart nginx')
