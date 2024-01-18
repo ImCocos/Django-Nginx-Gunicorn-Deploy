@@ -95,10 +95,10 @@ class Site:
         self.__make_gunicorn_socket()
 
     def __move_configs(self) -> None:
-        os.system(f'cp {self.name}.tmp {self.sites_enabled_path}/{self.name}')
-        os.system(f'mv {self.name}.tmp {self.sites_available_path}/{self.name}')
-        os.system(f'mv {self.name}.service.tmp {self.gunicorn_services_path}/{self.name}.service')
-        os.system(f'mv {self.name}.socket.tmp {self.gunicorn_services_path}/{self.name}.socket')
+        os.system(f'cp {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_enabled_path, self.name)}')
+        os.system(f'mv {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_available_path, self.name)}')
+        os.system(f'mv {os.path.join(CWD, self.name + ".service.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".service")}')
+        os.system(f'mv {os.path.join(CWD, self.name + ".socket.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".socket")}')
 
     def reload(self) -> None:
         os.system(f'systemctl restart {self.name}')
