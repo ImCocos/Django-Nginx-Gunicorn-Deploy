@@ -13,7 +13,7 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 
 1. ```
     cd Django-Nginx-Gunicorn-Deploy
-    sudo make
+    sudo python3.11 make.py
     cp config.example.ini sites/<site_name>.ini
     ```
 2. Reload shell
@@ -28,4 +28,3 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 # Dependencies
 
  - nginx
- - make

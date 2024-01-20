@@ -57,6 +57,11 @@ class Site:
             self.gunicorn_services_path
         )
 
+        self.nginx_enabled_config_path = Path(self.sites_enabled_path) / Path(self.name)
+        self.nginx_available_config_path = Path(self.sites_available_path) / Path(self.name)
+        self.systemd_service_config_path = Path(self.gunicorn_services_path) / Path(self.name + '.service')
+        self.systemd_socket_config_path = Path(self.gunicorn_services_path) / Path(self.name + '.socket')
+
     def __make_nginx_config(self) -> None:
         with open(os.path.join(CWD, '.sites-available/SITE_NAME_PLACEHOLDER')) as file:
             nginx_file_row = file.read()
@@ -98,10 +103,10 @@ class Site:
         self.__make_gunicorn_socket()
 
     def __move_configs(self) -> None:
-        os.system(f'sudo cp {Path(CWD) / Path(self.name + ".tmp")} {Path(CWD) / Path(self.sites_enabled_path) / Path(self.name)}')
-        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".tmp")} {Path(CWD) / Path(self.sites_available_path) / Path(self.name)}')
-        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".service.tmp")} {Path(CWD) / Path(self.gunicorn_services_path) / Path(self.name + ".service")}')
-        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".socket.tmp")} {Path(CWD) / Path(self.gunicorn_services_path) / Path(self.name + ".socket")}')
+        os.system(f'sudo cp {Path(CWD) / Path(self.name + ".tmp")} {self.nginx_enabled_config_path}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".tmp")} {self.nginx_available_config_path}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".service.tmp")} {self.systemd_service_config_path}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".socket.tmp")} {self.systemd_socket_config_path}')
 
     def reload(self) -> None:
         os.system('sudo systemctl daemon-reload')
@@ -110,17 +115,20 @@ class Site:
         os.system('sudo systemctl restart nginx')
 
     def stop(self) -> None:
-        os.system(f'sudo systemctl disable {self.name}')
-        os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {Path(self.sites_enabled_path) / Path(self.name)}')
+        os.system(f'sudo systemctl disable {self.name}.socket')
+        os.system(f'sudo systemctl disable {self.name}.service')
+        os.system(f'sudo systemctl stop {self.name}.socket')
+        os.system(f'sudo systemctl stop {self.name}.service')
+        os.system(f'sudo rm {self.nginx_enabled_config_path}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
     def start(self) -> None:
-        os.system(f'sudo systemctl enable {self.name}')
-        os.system(f'sudo systemctl start {self.name}')
-        os.system(f'sudo systemctl restart {self.name}')
-        os.system(f'sudo cp {Path(self.sites_available_path) / Path(self.name)} {Path(self.sites_enabled_path) / Path(self.name)}')
+        os.system(f'sudo systemctl enable {self.name}.socket')
+        os.system(f'sudo systemctl enable {self.name}.service')
+        os.system(f'sudo systemctl start {self.name}.socket')
+        os.system(f'sudo systemctl start {self.name}.service')
+        os.system(f'sudo cp {self.nginx_available_config_path} {self.nginx_enabled_config_path}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
@@ -131,40 +139,53 @@ class Site:
         self.reload()
 
     def delete(self) -> None:
-        os.system(f'sudo systemctl disable {self.name}')
-        os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {Path(self.sites_enabled_path) / Path(self.name)}')
-        os.system(f'sudo rm {Path(self.sites_available_path) / Path(self.name)}')
-        os.system(f'sudo rm {Path(self.gunicorn_services_path) / Path(self.name + ".service")}')
-        os.system(f'sudo rm {Path(self.gunicorn_services_path) / Path(self.name + ".socket")}')
+        os.system(f'sudo systemctl disable {self.name}.socket')
+        os.system(f'sudo systemctl disable {self.name}.service')
+        os.system(f'sudo systemctl stop {self.name}.socket')
+        os.system(f'sudo systemctl stop {self.name}.service')
+        os.system(f'sudo rm {self.nginx_enabled_config_path}')
+        os.system(f'sudo rm {self.nginx_available_config_path}')
+        os.system(f'sudo rm {self.systemd_service_config_path}')
+        os.system(f'sudo rm {self.systemd_socket_config_path}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
-    def is_active(self) -> bool:
-        return int(os.system(f'systemctl is-active --quiet {self.name}')) == 0
+    def service_is_active(self) -> bool:
+        return int(os.system(f'systemctl is-active --quiet {self.name}.service')) == 0
 
+    def socket_is_active(self) -> bool:
+        return int(os.system(f'systemctl is-active --quiet {self.name}.socket')) == 0
 
     def __have_nginx_config_available(self) -> bool:
-        return (Path(self.sites_available_path) / Path(self.name)).exists()
+        return self.nginx_available_config_path.exists()
 
     def __have_nginx_config_enabled(self) -> bool:
-        return (Path(self.sites_enabled_path) / Path(self.name)).exists()
+        return self.nginx_enabled_config_path.exists()
 
     def __have_gunicorn_service(self) -> bool:
-        return (Path(self.gunicorn_services_path) / Path(f'{self.name}.service')).exists()
+        return self.systemd_service_config_path.exists()
 
     def __have_gunicorn_socket(self) -> bool:
-        return (Path(self.gunicorn_services_path) / Path(f'{self.name}.socket')).exists()
+        return self.systemd_socket_config_path.exists()
 
-    def info(self) -> None:
-        status = paint('active', paint.GREEN) if self.is_active() else paint('inactive', paint.RED)
-        have_nginx_enabled, nginx_enabled = self.__have_nginx_config_enabled(), Path(self.sites_available_path) / Path(self.name)
-        have_nginx_available, nginx_available = self.__have_nginx_config_available(), Path(self.sites_enabled_path) / Path(self.name)
-        have_systemd_service, systemd_service = self.__have_gunicorn_service(), Path(self.gunicorn_services_path) / Path(self.name + ".service")
-        have_systemd_socket, systemd_socket = self.__have_gunicorn_socket(), Path(self.gunicorn_services_path) / Path(self.name + ".socket")
+    def status(self) -> None:
+        have_nginx_enabled = self.__have_nginx_config_enabled()
+        have_nginx_available = self.__have_nginx_config_available()
+        have_systemd_service = self.__have_gunicorn_service()
+        have_systemd_socket = self.__have_gunicorn_socket()
 
-        print(f'{self.name}({status}):')
-        print(f' {paint("[+]", paint.GREEN) if have_nginx_enabled else paint("[-]", paint.RED)} Nginx config in sites-enabled - {nginx_enabled if have_nginx_enabled else paint(nginx_enabled.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_nginx_available else paint("[-]", paint.RED)} Nginx config in sites-available - {nginx_available if have_nginx_available else paint(nginx_available.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_systemd_service else paint("[-]", paint.RED)} Systemd service config in system - {systemd_service if have_systemd_service else paint(systemd_service.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_systemd_socket else paint("[-]", paint.RED)} Systemd socket config in system - {systemd_socket if have_systemd_socket else paint(systemd_socket.__str__(), paint.GREY)}')
+        service_status = paint('active', paint.GREEN) if self.service_is_active() else paint('inactive', paint.RED)
+        socket_status = paint('active', paint.GREEN) if self.socket_is_active() else paint('inactive', paint.RED)
+        print(f'{self.name}({paint(self.daemon, paint.BLUE)}):')
+        print(f' {paint("[+]", paint.GREEN) if have_nginx_enabled else paint("[-]", paint.RED)} Nginx config in sites-enabled - {self.nginx_enabled_config_path if have_nginx_enabled else paint(self.nginx_enabled_config_path.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_nginx_available else paint("[-]", paint.RED)} Nginx config in sites-available - {self.nginx_available_config_path if have_nginx_available else paint(self.nginx_available_config_path.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_systemd_service else paint("[-]", paint.RED)} ({service_status}) Systemd service config in system - {self.systemd_service_config_path if have_systemd_service else paint(self.systemd_service_config_path.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_systemd_socket else paint("[-]", paint.RED)} ({socket_status}) Systemd socket config in system - {self.systemd_socket_config_path if have_systemd_socket else paint(self.systemd_socket_config_path.__str__(), paint.GREY)}')
+
+    @classmethod
+    def list(cls) -> None:
+        for name in os.listdir(os.path.join(CWD, 'sites')):
+            if '.ini' in name:
+                site = cls('sites/' + name)
+                site.status()
+

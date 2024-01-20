@@ -1,5 +1,7 @@
 import sys
 
+import os
+
 from site_config import Site
 
 
@@ -10,17 +12,24 @@ except IndexError:
     raise AttributeError('You can\'t call without flags!')
 
 
+if cmd == 'list':
+    Site.list()
+    sys.exit(1)
+
 if cmd == 'help':
     string = '''
 help - all flags
+
+list - list of all sites
 
 make <SiteName> - creates configs and starts site
 start <SiteName> - starts site
 stop <SiteName> - stops site
 reload <SiteName> - reloads site
 delete <SiteName> - deletes ALL site configs beside <SiteName>.ini
-status <SiteName> - is active or not
-info <SiteName> - info about configs
+status <SiteName> - status about configs:
+ [+] - config exists
+ [-] - config does not exists
 '''.strip()
     print(string)
     sys.exit(1)
@@ -34,22 +43,25 @@ except IndexError:
 if cmd == 'make':
     site = Site(arg)
     site.make()
-    site.info()
+    site.status()
     sys.exit(1)
 
 if cmd == 'start':
     site = Site(arg)
     site.start()
+    site.status()
     sys.exit(1)
 
 if cmd == 'stop':
     site = Site(arg)
     site.stop()
+    site.status()
     sys.exit(1)
 
 if cmd == 'reload':
     site = Site(arg)
     site.reload()
+    site.status()
     sys.exit(1)
 
 if cmd == 'delete':
@@ -60,18 +72,12 @@ if cmd == 'delete':
         sys.exit(1)
     print(f'Deleting configs...')
     site.delete()
-    site.info()
+    site.status()
     sys.exit(1)
 
 if cmd == 'status':
     site = Site(arg)
-    status = 'active' if site.is_active() else 'inactive'
-    print(f'{site.name} - {status}')
-    sys.exit(1)
-
-if cmd == 'info':
-    site = Site(arg)
-    site.info()
+    site.status()
     sys.exit(1)
 
 
