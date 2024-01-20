@@ -188,4 +188,5 @@ class Site:
             if '.ini' in name:
                 site = cls('sites/' + name)
                 site.status()
+                print()
 
