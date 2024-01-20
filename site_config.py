@@ -2,6 +2,8 @@ from typing import Any
 
 import os
 
+from pathlib import Path
+
 import configparser
 
 
@@ -93,10 +95,10 @@ class Site:
         self.__make_gunicorn_socket()
 
     def __move_configs(self) -> None:
-        os.system(f'sudo cp {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_enabled_path, self.name)}')
-        os.system(f'sudo mv {os.path.join(CWD, self.name + ".tmp")} {os.path.join(CWD, self.sites_available_path, self.name)}')
-        os.system(f'sudo mv {os.path.join(CWD, self.name + ".service.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".service")}')
-        os.system(f'sudo mv {os.path.join(CWD, self.name + ".socket.tmp")} {os.path.join(CWD, self.gunicorn_services_path, self.name + ".socket")}')
+        os.system(f'sudo cp {Path(CWD) / Path(self.name + ".tmp")} {Path(CWD) / Path(self.sites_enabled_path) / Path(self.name)}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".tmp")} {Path(CWD) / Path(self.sites_available_path) / Path(self.name)}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".service.tmp")} {Path(CWD) / Path(self.gunicorn_services_path) / Path(self.name + ".service")}')
+        os.system(f'sudo mv {Path(CWD) / Path(self.name + ".socket.tmp")} {Path(CWD) / Path(self.gunicorn_services_path) / Path(self.name + ".socket")}')
 
     def reload(self) -> None:
         os.system('sudo systemctl daemon-reload')
@@ -107,7 +109,7 @@ class Site:
     def stop(self) -> None:
         os.system(f'sudo systemctl disable {self.name}')
         os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
+        os.system(f'sudo rm {Path(self.sites_enabled_path) / Path(self.name)}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
@@ -115,22 +117,25 @@ class Site:
         os.system(f'sudo systemctl enable {self.name}')
         os.system(f'sudo systemctl start {self.name}')
         os.system(f'sudo systemctl restart {self.name}')
-        os.system(f'sudo cp {self.sites_available_path}/{self.name} {self.sites_enabled_path}/{self.name}')
+        os.system(f'sudo cp {Path(self.sites_available_path) / Path(self.name)} {Path(self.sites_enabled_path) / Path(self.name)}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
     def make(self) -> None:
         self.__make_configs()
         self.__move_configs()
-        os.system(f'{self.virtual_enviromnt_path}/bin/python -m pip install gunicorn --no-cache-dir')
+        os.system(f'{Path(self.virtual_enviromnt_path)}/bin/python -m pip install gunicorn --no-cache-dir')
         self.reload()
 
     def delete(self) -> None:
         os.system(f'sudo systemctl disable {self.name}')
         os.system(f'sudo systemctl stop {self.name}')
-        os.system(f'sudo rm {self.sites_enabled_path}/{self.name}')
-        os.system(f'sudo rm {self.sites_available_path}/{self.name}')
-        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.service')
-        os.system(f'sudo rm {self.gunicorn_services_path}/{self.name}.socket')
+        os.system(f'sudo rm {Path(self.sites_enabled_path) / Path(self.name)}')
+        os.system(f'sudo rm {Path(self.sites_available_path) / Path(self.name)}')
+        os.system(f'sudo rm {Path(self.gunicorn_services_path) / Path(self.name + ".service")}')
+        os.system(f'sudo rm {Path(self.gunicorn_services_path) / Path(self.name + ".socket")}')
         os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
+
+    def is_active(self) -> bool:
+        return int(os.system(f'systemctl is-active --quiet {self.name}')) == 0
