@@ -73,6 +73,6 @@ if cmd == 'delete':
 
 if cmd == 'status':
     site = Site(arg)
-    status = 'running' if site.is_active() else 'not running'
-    print(f'Site is {status} now')
+    status = 'active' if site.is_active() else 'inactive'
+    print(f'{site.name} - {status}')
     sys.exit(1)
