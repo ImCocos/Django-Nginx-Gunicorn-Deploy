@@ -21,7 +21,7 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 3. Fill the config.(store it in Django-Nginx-Gunicorn-Deploy/sites)
 > Required fileds are marked with [*], other aren't necessary.
 
-3. ```
+4. ```
     sudo sitemanager help
     ```
 
