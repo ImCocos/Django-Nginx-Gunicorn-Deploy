@@ -22,7 +22,7 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
     > Required fileds are marked with [*], other aren't necessary.
 
 4. ```
-    sudo sitemanager help
+    sitemanager help
     ```
 
 # Dependencies
