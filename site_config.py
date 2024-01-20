@@ -6,8 +6,11 @@ from pathlib import Path
 
 import configparser
 
+from text import Painter
+
 
 CWD = os.path.dirname(__file__)
+paint = Painter()
 
 
 class Site:
@@ -139,3 +142,29 @@ class Site:
 
     def is_active(self) -> bool:
         return int(os.system(f'systemctl is-active --quiet {self.name}')) == 0
+
+
+    def __have_nginx_config_available(self) -> bool:
+        return (Path(self.sites_available_path) / Path(self.name)).exists()
+
+    def __have_nginx_config_enabled(self) -> bool:
+        return (Path(self.sites_enabled_path) / Path(self.name)).exists()
+
+    def __have_gunicorn_service(self) -> bool:
+        return (Path(self.gunicorn_services_path) / Path(f'{self.name}.service')).exists()
+
+    def __have_gunicorn_socket(self) -> bool:
+        return (Path(self.gunicorn_services_path) / Path(f'{self.name}.socket')).exists()
+
+    def info(self) -> None:
+        status = paint('active', paint.GREEN) if self.is_active() else paint('inactive', paint.RED)
+        have_nginx_enabled, nginx_enabled = self.__have_nginx_config_enabled(), Path(self.sites_available_path) / Path(self.name)
+        have_nginx_available, nginx_available = self.__have_nginx_config_available(), Path(self.sites_enabled_path) / Path(self.name)
+        have_systemd_service, systemd_service = self.__have_gunicorn_service(), Path(self.gunicorn_services_path) / Path(self.name + ".service")
+        have_systemd_socket, systemd_socket = self.__have_gunicorn_socket(), Path(self.gunicorn_services_path) / Path(self.name + ".socket")
+
+        print(f'{self.name}({status}):')
+        print(f' {paint("[+]", paint.GREEN) if have_nginx_enabled else paint("[-]", paint.RED)} Nginx config in sites-enabled - {nginx_enabled if have_nginx_enabled else paint(nginx_enabled.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_nginx_available else paint("[-]", paint.RED)} Nginx config in sites-available - {nginx_available if have_nginx_available else paint(nginx_available.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_systemd_service else paint("[-]", paint.RED)} Systemd service config in system - {systemd_service if have_systemd_service else paint(systemd_service.__str__(), paint.GREY)}')
+        print(f' {paint("[+]", paint.GREEN) if have_systemd_socket else paint("[-]", paint.RED)} Systemd socket config in system - {systemd_socket if have_systemd_socket else paint(systemd_socket.__str__(), paint.GREY)}')

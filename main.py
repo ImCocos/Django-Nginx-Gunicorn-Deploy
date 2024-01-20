@@ -20,21 +20,11 @@ stop <SiteName> - stops site
 reload <SiteName> - reloads site
 delete <SiteName> - deletes ALL site configs beside <SiteName>.ini
 status <SiteName> - is active or not
+info <SiteName> - info about configs
 '''.strip()
     print(string)
     sys.exit(1)
 
-
-if cmd not in (
-    'make',
-    'start',
-    'stop',
-    'delete',
-    'reload',
-    'status',
-):
-    print('Unbound command! Try "sitemanager help"')
-    sys.exit(1)
 
 try:
     arg = 'sites/' + sys.argv[2] + '.ini'
@@ -44,6 +34,7 @@ except IndexError:
 if cmd == 'make':
     site = Site(arg)
     site.make()
+    site.info()
     sys.exit(1)
 
 if cmd == 'start':
@@ -69,6 +60,7 @@ if cmd == 'delete':
         sys.exit(1)
     print(f'Deleting configs...')
     site.delete()
+    site.info()
     sys.exit(1)
 
 if cmd == 'status':
@@ -76,3 +68,11 @@ if cmd == 'status':
     status = 'active' if site.is_active() else 'inactive'
     print(f'{site.name} - {status}')
     sys.exit(1)
+
+if cmd == 'info':
+    site = Site(arg)
+    site.info()
+    sys.exit(1)
+
+
+print('Unbound command! Try "sitemanager help"')
