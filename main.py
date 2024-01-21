@@ -51,15 +51,14 @@ help - all flags
 
 list - list of all sites
 
-make [<SiteName>] - creates configs and starts site # can be called from project workdir
+make [<SiteName>] - creates configs and starts site # can be called from project workdir without <SiteName>
 
-start [<SiteName>] - starts site # can be called from project workdir
-stop [<SiteName>] - stops site # can be called from project workdir
-reload [<SiteName>] - reloads site # can be called from project workdir
-delete [<SiteName>] - deletes ALL site configs beside <SiteName>.ini # can be called from project workdir
-
-status-json [<SiteName>] - status about configs in json # can be called from project workdir
-status [<SiteName>] - status about configs # can be called from project workdir
+start [<SiteName>] - starts site # can be called from project workdir without <SiteName>
+stop [<SiteName>] - stops site # can be called from project workdir without <SiteName>
+reload [<SiteName>] - reloads site # can be called from project workdir without <SiteName>
+delete [<SiteName>] - deletes ALL site configs beside <SiteName>.ini # can be called from project workdir without <SiteName>
+status-json [<SiteName>] - status about configs in json # can be called from project workdir without <SiteName>
+status [<SiteName>] - status about configs # can be called from project workdir without <SiteName>
  [+] - config exists
  [-] - config does not exists
 '''.strip()
