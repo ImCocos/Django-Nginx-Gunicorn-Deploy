@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Self, List
 
 import os
 
@@ -249,4 +249,20 @@ class Site:
                 site = cls(name)
                 site.print_status()
                 print()
+
+    @classmethod
+    def get_all_sites(cls) -> List[Self]:
+        return [
+            cls(name)
+            for name in os.listdir(os.path.join(CWD, 'sites'))
+            if '.ini' in name
+        ]
+
+    @classmethod
+    def try_get_site_by_cwd(cls) -> Self | None:
+        workdir = os.getcwd()
+        for site in cls.get_all_sites():
+            if site.workdir == workdir:
+                return site
+        return None
 

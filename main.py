@@ -1,4 +1,4 @@
-# import os
+import os
 
 import sys
 
@@ -55,32 +55,62 @@ status <SiteName> - status about configs
     print(string)
 
 @router.handler('make')
-def make(name: str):
-    site = Site(name)
+def make(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     site.make()
     site.print_status()
 
 @router.handler('start')
-def start(name: str):
-    site = Site(name)
+def start(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     site.start()
     site.print_status()
 
 @router.handler('stop')
-def stop(name: str):
-    site = Site(name)
+def stop(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     site.stop()
     site.print_status()
 
 @router.handler('reload')
-def reload(name: str):
-    site = Site(name)
+def reload(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     site.reload()
     site.print_status()
 
 @router.handler('delete')
-def delete(name: str):
-    site = Site(name)
+def delete(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     confirmation = input(f'Are you sure? This will remove ALL {name} configs.[y/N]').lower()
     if confirmation in ('n', 'no'):
         print('Configs will not be deleted.')
@@ -90,13 +120,25 @@ def delete(name: str):
     site.print_status()
 
 @router.handler('status')
-def status(name: str):
-    site = Site(name)
+def status(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     site.print_status()
 
 @router.handler('status-json')
-def status_json(name: str):
-    site = Site(name)
+def status_json(name: str | None = None):
+    if not name:
+        site = Site.try_get_site_by_cwd()
+        if not site:
+            print(f'No site with such working directory - "{os.getcwd()}"')
+            return
+    else:
+        site = Site(name)
     print(site.status())
 
 @router.handler()

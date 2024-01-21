@@ -18,7 +18,11 @@ class Handler:
         return (
             (cmd == self.cmd)
             and
-            (len(args[1:]) == len(self.flags))
+            ((len(args[1:]) == len([
+                flag
+                for flag in self.flags
+                if not isinstance(None, self.foo.__annotations__[flag])
+            ])) or len(args[1:]) == len(self.flags))
         ) or not self.cmd
 
     def handle(self, *args: str) -> None:
