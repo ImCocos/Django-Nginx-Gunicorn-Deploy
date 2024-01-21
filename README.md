@@ -28,4 +28,4 @@ git clone https://github.com/ImCocos/Django-Nginx-Gunicorn-Deploy.git
 # Dependencies
 
  - nginx
-- python v3.11
+ - python v3.11
