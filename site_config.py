@@ -109,9 +109,9 @@ class Site:
         os.system(f'sudo mv {Path(CWD) / Path(self.name + ".socket.tmp")} {self.systemd_socket_config_path}')
 
     def reload(self) -> None:
-        os.system('sudo systemctl daemon-reload')
         os.system(f'sudo systemctl restart {self.name}.socket')
         os.system(f'sudo systemctl restart {self.name}.service')
+        os.system('sudo systemctl daemon-reload')
         os.system('sudo systemctl restart nginx')
 
     def stop(self) -> None:
@@ -168,25 +168,72 @@ class Site:
     def __have_gunicorn_socket(self) -> bool:
         return self.systemd_socket_config_path.exists()
 
-    def status(self) -> None:
-        have_nginx_enabled = self.__have_nginx_config_enabled()
-        have_nginx_available = self.__have_nginx_config_available()
-        have_systemd_service = self.__have_gunicorn_service()
-        have_systemd_socket = self.__have_gunicorn_socket()
+    def status(self) -> dict:
+        nginx_config_enabled_exists = self.__have_nginx_config_enabled()
+        nginx_config_available_exists = self.__have_nginx_config_available()
 
-        service_status = paint('active', paint.GREEN) if self.service_is_active() else paint('inactive', paint.RED)
-        socket_status = paint('active', paint.GREEN) if self.socket_is_active() else paint('inactive', paint.RED)
-        print(f'{self.name}({paint(self.daemon, paint.BLUE)}):')
-        print(f' {paint("[+]", paint.GREEN) if have_nginx_enabled else paint("[-]", paint.RED)} Nginx config in sites-enabled - {self.nginx_enabled_config_path if have_nginx_enabled else paint(self.nginx_enabled_config_path.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_nginx_available else paint("[-]", paint.RED)} Nginx config in sites-available - {self.nginx_available_config_path if have_nginx_available else paint(self.nginx_available_config_path.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_systemd_service else paint("[-]", paint.RED)} ({service_status}) Systemd service config in system - {self.systemd_service_config_path if have_systemd_service else paint(self.systemd_service_config_path.__str__(), paint.GREY)}')
-        print(f' {paint("[+]", paint.GREEN) if have_systemd_socket else paint("[-]", paint.RED)} ({socket_status}) Systemd socket config in system - {self.systemd_socket_config_path if have_systemd_socket else paint(self.systemd_socket_config_path.__str__(), paint.GREY)}')
+        systemd_service_config_exists = self.__have_gunicorn_service()
+        systemd_socket_config_exists = self.__have_gunicorn_socket()
+
+        service_status = self.service_is_active()
+        socket_status = self.socket_is_active()
+
+        return {
+            'nginx': {
+                'enabled': {
+                    'exists': nginx_config_enabled_exists,
+                    'active': 'none'
+                },
+                'available': {
+                    'exists': nginx_config_available_exists,
+                    'active': 'none'
+                }
+            },
+            'systemd': {
+                'service': {
+                    'exists': systemd_service_config_exists,
+                    'active': service_status
+                },
+                'socket': {
+                    'exists': systemd_socket_config_exists,
+                    'active': socket_status
+                }
+            }
+        }
+
+    def print_status(self) -> None:
+        data = self.status()
+
+        service_status = paint('active', paint.GREEN) if data['systemd']['service']['active'] else paint('inactive', paint.RED)
+        socket_status = paint('active', paint.GREEN) if data['systemd']['socket']['active'] else paint('inactive', paint.RED)
+
+        nginx_enabled_config_status = paint(data['nginx']['enabled']['active'], paint.YELLOW)
+        nginx_available_config_status = paint(data['nginx']['available']['active'], paint.YELLOW)
+
+        service_config_exists = paint('[+]', paint.GREEN) if data['systemd']['service']['exists'] else paint('[-]', paint.RED)
+        socket_config_exists = paint('[+]', paint.GREEN) if data['systemd']['socket']['exists'] else paint('[-]', paint.RED)
+
+        service_config_path = self.systemd_service_config_path if data['systemd']['service']['exists'] else paint(self.systemd_service_config_path.__str__(), paint.GREY)
+        socket_config_path = self.systemd_socket_config_path if data['systemd']['socket']['exists'] else paint(self.systemd_socket_config_path.__str__(), paint.GREY)
+
+        nginx_enabled_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['enabled']['exists'] else paint("[-]", paint.RED)
+        nginx_available_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['available']['exists'] else paint("[-]", paint.RED)
+
+        nginx_enabled_config_path = self.nginx_enabled_config_path if data['nginx']['enabled']['exists'] else paint(self.nginx_enabled_config_path.__str__(), paint.GREY)
+        nginx_available_config_path = self.nginx_available_config_path if data['nginx']['available']['exists'] else paint(self.nginx_available_config_path.__str__(), paint.GREY)
+
+        print(f'{self.name}[{paint("daemon", paint.GREEN)}: {paint(self.daemon, paint.GREEN)}]:')
+
+        print(f' {nginx_enabled_config_exists_status} ({nginx_enabled_config_status}) Nginx config in sites-enabled - {nginx_enabled_config_path}')
+        print(f' {nginx_available_config_exists_status} ({nginx_available_config_status}) Nginx config in sites-available - {nginx_available_config_path}')
+        print(f' {service_config_exists} ({service_status}) Systemd service config in system - {service_config_path}')
+        print(f' {socket_config_exists} ({socket_status}) Systemd socket config in system - {socket_config_path}')
 
     @classmethod
     def list(cls) -> None:
         for name in os.listdir(os.path.join(CWD, 'sites')):
             if '.ini' in name:
                 site = cls('sites/' + name)
-                site.status()
+                site.print_status()
                 print()
 

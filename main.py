@@ -23,11 +23,14 @@ help - all flags
 list - list of all sites
 
 make <SiteName> - creates configs and starts site
+
 start <SiteName> - starts site
 stop <SiteName> - stops site
 reload <SiteName> - reloads site
 delete <SiteName> - deletes ALL site configs beside <SiteName>.ini
-status <SiteName> - status about configs:
+
+status-json <SiteName> - status about configs in json
+status <SiteName> - status about configs
  [+] - config exists
  [-] - config does not exists
 '''.strip()
@@ -43,25 +46,25 @@ except IndexError:
 if cmd == 'make':
     site = Site(arg)
     site.make()
-    site.status()
+    site.print_status()
     sys.exit(1)
 
 if cmd == 'start':
     site = Site(arg)
     site.start()
-    site.status()
+    site.print_status()
     sys.exit(1)
 
 if cmd == 'stop':
     site = Site(arg)
     site.stop()
-    site.status()
+    site.print_status()
     sys.exit(1)
 
 if cmd == 'reload':
     site = Site(arg)
     site.reload()
-    site.status()
+    site.print_status()
     sys.exit(1)
 
 if cmd == 'delete':
@@ -72,12 +75,17 @@ if cmd == 'delete':
         sys.exit(1)
     print(f'Deleting configs...')
     site.delete()
-    site.status()
+    site.print_status()
     sys.exit(1)
 
 if cmd == 'status':
     site = Site(arg)
-    site.status()
+    site.print_status()
+    sys.exit(1)
+
+if cmd == 'status-json':
+    site = Site(arg)
+    print(site.status())
     sys.exit(1)
 
 
