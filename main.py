@@ -1,22 +1,40 @@
+# import os
+
 import sys
 
-import os
+from app import Router
 
 from site_config import Site
 
-
-try:
-    cmd = sys.argv[1]
-except IndexError:
-    print('Try "sitemanager help"')
-    raise AttributeError('You can\'t call without flags!')
+from completer import Completer
 
 
-if cmd == 'list':
+# CWD = os.path.dirname(__file__)
+router = Router()
+# Completer(
+#     [
+#         'help',
+#         'make',
+#         'start',
+#         'stop',
+#         'reload',
+#         'delete',
+#         'status-json',
+#         'status',
+#     ],
+#     [
+#         name.replace('.ini')
+#         for name in os.listdr(os.path.join(CWD, 'sites/'))
+#         if '.ini' in name
+#     ]
+# )
+
+@router.handler('list')
+def sites_list():
     Site.list()
-    sys.exit(1)
 
-if cmd == 'help':
+@router.handler('help')
+def help():
     string = '''
 help - all flags
 
@@ -35,58 +53,56 @@ status <SiteName> - status about configs
  [-] - config does not exists
 '''.strip()
     print(string)
-    sys.exit(1)
 
-
-try:
-    arg = 'sites/' + sys.argv[2] + '.ini'
-except IndexError:
-    raise AttributeError(f'Pass argument with {cmd}')
-
-if cmd == 'make':
-    site = Site(arg)
+@router.handler('make')
+def make(name: str):
+    site = Site(name)
     site.make()
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'start':
-    site = Site(arg)
+@router.handler('start')
+def start(name: str):
+    site = Site(name)
     site.start()
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'stop':
-    site = Site(arg)
+@router.handler('stop')
+def stop(name: str):
+    site = Site(name)
     site.stop()
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'reload':
-    site = Site(arg)
+@router.handler('reload')
+def reload(name: str):
+    site = Site(name)
     site.reload()
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'delete':
-    site = Site(arg)
+@router.handler('delete')
+def delete(name: str):
+    site = Site(name)
     confirmation = input(f'Are you sure? This will remove ALL {arg} configs.[y/N]').lower()
     if confirmation in ('n', 'no'):
         print('Configs will not be deleted.')
-        sys.exit(1)
+        return
     print(f'Deleting configs...')
     site.delete()
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'status':
-    site = Site(arg)
+@router.handler('status')
+def status(name: str):
+    site = Site(name)
     site.print_status()
-    sys.exit(1)
 
-if cmd == 'status-json':
-    site = Site(arg)
+@router.handler('status-json')
+def status_json(name: str):
+    site = Site(name)
     print(site.status())
-    sys.exit(1)
+
+@router.handler()
+def unbound():
+    print('Unbound command! Try "sitemanager help"')
 
 
-print('Unbound command! Try "sitemanager help"')
+if __name__ == '__main__':
+    router(sys.argv[1:])

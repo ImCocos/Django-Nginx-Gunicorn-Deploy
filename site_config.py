@@ -29,7 +29,16 @@ class Site:
             inline_comment_prefixes='#',
             empty_lines_in_values=True
         )
-        config.read(os.path.join(CWD, name))
+        if 'sites/' not in name:
+            name = 'sites/' + name
+        if '.ini' not in name:
+            name += '.ini'
+        config_path = os.path.join(CWD, name)
+
+        if not os.path.exists(config_path):
+            raise AttributeError(f'No such site with config "{name}"!')
+
+        config.read(config_path)
 
         defaults = configparser.ConfigParser()
         defaults.read(os.path.join(CWD, 'defaults.ini'))
@@ -233,7 +242,7 @@ class Site:
     def list(cls) -> None:
         for name in os.listdir(os.path.join(CWD, 'sites')):
             if '.ini' in name:
-                site = cls('sites/' + name)
+                site = cls(name)
                 site.print_status()
                 print()
 
