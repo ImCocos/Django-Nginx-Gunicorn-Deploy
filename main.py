@@ -81,7 +81,7 @@ def reload(name: str):
 @router.handler('delete')
 def delete(name: str):
     site = Site(name)
-    confirmation = input(f'Are you sure? This will remove ALL {arg} configs.[y/N]').lower()
+    confirmation = input(f'Are you sure? This will remove ALL {name} configs.[y/N]').lower()
     if confirmation in ('n', 'no'):
         print('Configs will not be deleted.')
         return

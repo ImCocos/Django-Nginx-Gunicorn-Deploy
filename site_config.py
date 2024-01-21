@@ -231,7 +231,11 @@ class Site:
         nginx_enabled_config_path = self.nginx_enabled_config_path if data['nginx']['enabled']['exists'] else paint(self.nginx_enabled_config_path.__str__(), paint.GREY)
         nginx_available_config_path = self.nginx_available_config_path if data['nginx']['available']['exists'] else paint(self.nginx_available_config_path.__str__(), paint.GREY)
 
-        print(f'{self.name}[{paint("daemon", paint.GREEN)}: {paint(self.daemon, paint.GREEN)}]:')
+        daemon = paint(self.daemon, paint.GREEN)\
+        if all((data['systemd']['service']['active'], data['systemd']['socket']['active']))\
+        else paint(self.daemon, paint.GREY)
+
+        print(f'{self.name}[{paint("daemon", paint.GREEN)}: {daemon}]:')
 
         print(f' {nginx_enabled_config_exists_status} ({nginx_enabled_config_status}) Nginx config in sites-enabled - {nginx_enabled_config_path}')
         print(f' {nginx_available_config_exists_status} ({nginx_available_config_status}) Nginx config in sites-available - {nginx_available_config_path}')
