@@ -6,7 +6,7 @@ from app import Router
 
 from site_config import Site
 
-from completer import Completer
+# from completer import Completer
 
 
 # CWD = os.path.dirname(__file__)
