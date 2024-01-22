@@ -20,3 +20,4 @@ class Completer:
             return options[state]
         else:
             return None
+
