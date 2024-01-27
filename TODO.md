@@ -22,3 +22,5 @@ TODO:
 FIXME:
  - reorganize code to folders - MINIMAL - free
  - change GunicornServices and other like this wrong-naming to SystemdSystem or SystemdServoces(very boring and not interesting) - MINIMAL - free
+ - write annotations, tests, docstrings - DEFAULT - free
+
