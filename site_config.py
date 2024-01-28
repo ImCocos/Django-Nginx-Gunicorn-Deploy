@@ -8,19 +8,13 @@ import configparser
 
 from text import Painter
 
-
 CWD = os.path.dirname(__file__)
 paint = Painter()
 
 
 class Site:
     def __raise_if_none(self, name: str) -> Any:
-            raise AttributeError(f'"{name}" can\'t be empty!')
-
-    def validate_paths(self, *paths) -> None:
-        for path in paths:
-            if not os.path.exists(path):
-                raise ValueError(f'Path "{path}" does not exists!')
+        raise AttributeError(f'"{name}" can\'t be empty!')
 
     def __init__(self, name: str) -> None:
         config = configparser.ConfigParser(
@@ -46,13 +40,15 @@ class Site:
         self.name = config['DEFAULT']['SiteName'] or self.__raise_if_none('SiteName')
         self.user = config['DEFAULT']['User'] or self.__raise_if_none('User')
         self.workdir = config['DEFAULT']['WorkingDirectory'] or self.__raise_if_none('WorkingDirectory')
-        self.virtual_enviromnt_path = config['DEFAULT']['VirtualEnviromentPath'] or self.__raise_if_none('VirtualEnviromentPath')
+        self.virtual_enviromnt_path = config['DEFAULT']['VirtualEnviromentPath'] or self.__raise_if_none(
+            'VirtualEnviromentPath')
         self.application_file = config['application']['ApplicationFile'] or self.__raise_if_none('ApplicationFile')
 
         self.application_name = config['application']['ApplicationName'] or defaults['application']['ApplicationName']
         self.sites_enabled_path = config['nginx']['SitesEnabledPath'] or defaults['nginx']['SitesEnabledPath']
         self.sites_available_path = config['nginx']['SitesAvailablePath'] or defaults['nginx']['SitesAvailablePath']
-        self.gunicorn_services_path = config['gunicorn']['GunicornServicesPath'] or defaults['gunicorn']['GunicornServicesPath']
+        self.gunicorn_services_path = config['gunicorn']['GunicornServicesPath'] or defaults['gunicorn'][
+            'GunicornServicesPath']
         self.daemon = config['DEFAULT']['Daemon'] or defaults['DEFAULT']['Daemon']
 
         self.static_path = config['DEFAULT']['StaticPath'] or self.workdir
@@ -213,34 +209,52 @@ class Site:
     def print_status(self) -> None:
         data = self.status()
 
-        service_status = paint('active', paint.GREEN) if data['systemd']['service']['active'] else paint('inactive', paint.RED)
-        socket_status = paint('active', paint.GREEN) if data['systemd']['socket']['active'] else paint('inactive', paint.RED)
+        service_status = paint('active', paint.GREEN) if data['systemd']['service']['active'] else paint('inactive',
+                                                                                                         paint.RED)
+        socket_status = paint('active', paint.GREEN) if data['systemd']['socket']['active'] else paint('inactive',
+                                                                                                       paint.RED)
 
         nginx_enabled_config_status = paint(data['nginx']['enabled']['active'], paint.YELLOW)
         nginx_available_config_status = paint(data['nginx']['available']['active'], paint.YELLOW)
 
-        service_config_exists = paint('[+]', paint.GREEN) if data['systemd']['service']['exists'] else paint('[-]', paint.RED)
-        socket_config_exists = paint('[+]', paint.GREEN) if data['systemd']['socket']['exists'] else paint('[-]', paint.RED)
+        service_config_exists = paint('[+]', paint.GREEN) if data['systemd']['service']['exists'] else paint('[-]',
+                                                                                                             paint.RED)
+        socket_config_exists = paint('[+]', paint.GREEN) if data['systemd']['socket']['exists'] else paint('[-]',
+                                                                                                           paint.RED)
 
-        service_config_path = self.systemd_service_config_path if data['systemd']['service']['exists'] else paint(self.systemd_service_config_path.__str__(), paint.GREY)
-        socket_config_path = self.systemd_socket_config_path if data['systemd']['socket']['exists'] else paint(self.systemd_socket_config_path.__str__(), paint.GREY)
+        service_config_path = self.systemd_service_config_path if data['systemd']['service']['exists'] else paint(
+            self.systemd_service_config_path.__str__(), paint.GREY)
+        socket_config_path = self.systemd_socket_config_path if data['systemd']['socket']['exists'] else paint(
+            self.systemd_socket_config_path.__str__(), paint.GREY)
 
-        nginx_enabled_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['enabled']['exists'] else paint("[-]", paint.RED)
-        nginx_available_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['available']['exists'] else paint("[-]", paint.RED)
+        nginx_enabled_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['enabled']['exists'] else paint(
+            "[-]", paint.RED)
+        nginx_available_config_exists_status = paint("[+]", paint.GREEN) if data['nginx']['available'][
+            'exists'] else paint("[-]", paint.RED)
 
-        nginx_enabled_config_path = self.nginx_enabled_config_path if data['nginx']['enabled']['exists'] else paint(self.nginx_enabled_config_path.__str__(), paint.GREY)
-        nginx_available_config_path = self.nginx_available_config_path if data['nginx']['available']['exists'] else paint(self.nginx_available_config_path.__str__(), paint.GREY)
+        nginx_enabled_config_path = self.nginx_enabled_config_path if data['nginx']['enabled']['exists'] else paint(
+            self.nginx_enabled_config_path.__str__(), paint.GREY)
+        nginx_available_config_path = self.nginx_available_config_path if data['nginx']['available'][
+            'exists'] else paint(self.nginx_available_config_path.__str__(), paint.GREY)
 
-        daemon = paint(self.daemon, paint.GREEN)\
-        if all((data['systemd']['service']['active'], data['systemd']['socket']['active']))\
-        else paint(self.daemon, paint.GREY)
+        daemon = paint(self.daemon, paint.GREEN) \
+            if all((data['systemd']['service']['active'], data['systemd']['socket']['active'])) \
+            else paint(self.daemon, paint.GREY)
 
         print(f'{self.name}[{paint("daemon", paint.GREEN)}: {daemon}]:')
 
-        print(f' {nginx_enabled_config_exists_status} ({nginx_enabled_config_status}) Nginx config in sites-enabled - {nginx_enabled_config_path}')
-        print(f' {nginx_available_config_exists_status} ({nginx_available_config_status}) Nginx config in sites-available - {nginx_available_config_path}')
+        print(
+            f' {nginx_enabled_config_exists_status} ({nginx_enabled_config_status}) Nginx config in sites-enabled - {nginx_enabled_config_path}')
+        print(
+            f' {nginx_available_config_exists_status} ({nginx_available_config_status}) Nginx config in sites-available - {nginx_available_config_path}')
         print(f' {service_config_exists} ({service_status}) Systemd service config in system - {service_config_path}')
         print(f' {socket_config_exists} ({socket_status}) Systemd socket config in system - {socket_config_path}')
+
+    @staticmethod
+    def validate_paths(*paths) -> None:
+        for path in paths:
+            if not os.path.exists(path):
+                raise ValueError(f'Path "{path}" does not exists!')
 
     @classmethod
     def list(cls) -> None:
@@ -265,4 +279,3 @@ class Site:
             if site.workdir == workdir:
                 return site
         return None
-
