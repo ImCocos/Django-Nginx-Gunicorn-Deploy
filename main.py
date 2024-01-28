@@ -6,28 +6,10 @@ from app import Router
 
 from site_config import Site
 
-# from completer import Completer
+from resolver import Cmd, Flag, Arg
 
 
-# CWD = os.path.dirname(__file__)
 router = Router()
-# Completer(
-#     [
-#         'help',
-#         'make',
-#         'start',
-#         'stop',
-#         'reload',
-#         'delete',
-#         'status-json',
-#         'status',
-#     ],
-#     [
-#         name.replace('.ini')
-#         for name in os.listdr(os.path.join(CWD, 'sites/'))
-#         if '.ini' in name
-#     ]
-# )
 
 
 def get_site_or_error(name: str | None) -> Site:
@@ -40,12 +22,12 @@ def get_site_or_error(name: str | None) -> Site:
         return Site(name)
 
 
-@router.handler('list')
-def sites_list():
+@router.handler(Cmd('list'))
+def sites_list(cmd: str, ):
     Site.list()
 
-@router.handler('help')
-def help():
+@router.handler(Cmd('help'))
+def help(cmd: str, ):
     string = '''
 help - all flags
 
@@ -64,32 +46,32 @@ status [<SiteName>] - status about configs # can be called from project workdir 
 '''.strip()
     print(string)
 
-@router.handler('make')
-def make(name: str | None = None):
+@router.handler(Cmd('make'), Arg('name'))
+def make(cmd: str, name: str | None = None):
     site = get_site_or_error(name)
     site.make()
     site.print_status()
 
-@router.handler('start')
-def start(name: str | None = None):
+@router.handler(Cmd('start'), Arg('name'))
+def start(cmd: str, name: str | None = None):
     site = get_site_or_error(name)
     site.start()
     site.print_status()
 
-@router.handler('stop')
-def stop(name: str | None = None):
+@router.handler(Cmd('stop'), Arg('name'))
+def stop(cmd: str, name: str | None = None):
     site = get_site_or_error(name)
     site.stop()
     site.print_status()
 
-@router.handler('reload')
-def reload(name: str | None = None):
+@router.handler(Cmd('reload'), Arg('name'))
+def reload(cmd: str, name: str | None = None):
     site = get_site_or_error(name)
     site.reload()
     site.print_status()
 
-@router.handler('delete')
-def delete(name: str | None = None):
+@router.handler(Cmd('delete'), Arg('name'))
+def delete(cmd: str, name: str | None = None):
     site = get_site_or_error(name)
     confirmation = input(f'Are you sure? This will remove ALL {name} configs.[y/N]').lower()
     if confirmation in ('n', 'no'):
@@ -99,18 +81,17 @@ def delete(name: str | None = None):
     site.delete()
     site.print_status()
 
-@router.handler('status')
-def status(name: str | None = None):
+@router.handler(Cmd('status'), Arg('name'), Flag('--json'))
+def status(cmd: str, *flags: str, name: str | None = None):
+    if '--json' in flags:
+        site = get_site_or_error(name)
+        print(site.status())
+        return
     site = get_site_or_error(name)
     site.print_status()
 
-@router.handler('status-json')
-def status_json(name: str | None = None):
-    site = get_site_or_error(name)
-    print(site.status())
-
 @router.handler()
-def unbound():
+def unbound(cmd: str, ):
     print('Unbound command! Try "sitemanager help"')
 
 
