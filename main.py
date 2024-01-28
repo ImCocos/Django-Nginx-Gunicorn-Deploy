@@ -11,6 +11,8 @@ from site_config import Site
 
 # CWD = os.path.dirname(__file__)
 router = Router()
+
+
 # Completer(
 #     [
 #         'help',
@@ -41,11 +43,12 @@ def get_site_or_error(name: str | None) -> Site:
 
 
 @router.handler('list')
-def sites_list():
+def sites_list() -> None:
     Site.list()
 
+
 @router.handler('help')
-def help():
+def help() -> None:
     string = '''
 help - all flags
 
@@ -64,32 +67,37 @@ status [<SiteName>] - status about configs # can be called from project workdir 
 '''.strip()
     print(string)
 
+
 @router.handler('make')
-def make(name: str | None = None):
+def make(name: str | None = None) -> None:
     site = get_site_or_error(name)
     site.make()
     site.print_status()
 
+
 @router.handler('start')
-def start(name: str | None = None):
+def start(name: str | None = None) -> None:
     site = get_site_or_error(name)
     site.start()
     site.print_status()
 
+
 @router.handler('stop')
-def stop(name: str | None = None):
+def stop(name: str | None = None) -> None:
     site = get_site_or_error(name)
     site.stop()
     site.print_status()
 
+
 @router.handler('reload')
-def reload(name: str | None = None):
+def reload(name: str | None = None) -> None:
     site = get_site_or_error(name)
     site.reload()
     site.print_status()
 
+
 @router.handler('delete')
-def delete(name: str | None = None):
+def delete(name: str | None = None) -> None:
     site = get_site_or_error(name)
     confirmation = input(f'Are you sure? This will remove ALL {name} configs.[y/N]').lower()
     if confirmation in ('n', 'no'):
@@ -99,18 +107,21 @@ def delete(name: str | None = None):
     site.delete()
     site.print_status()
 
+
 @router.handler('status')
-def status(name: str | None = None):
+def status(name: str | None = None) -> None:
     site = get_site_or_error(name)
     site.print_status()
 
+
 @router.handler('status-json')
-def status_json(name: str | None = None):
+def status_json(name: str | None = None) -> None:
     site = get_site_or_error(name)
     print(site.status())
 
+
 @router.handler()
-def unbound():
+def unbound() -> None:
     print('Unbound command! Try "sitemanager help"')
 
 
